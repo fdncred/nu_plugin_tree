@@ -29,3 +29,4 @@ Examples:
   Transform the tabular output into a tree
   > ls | tree
 ```
+![image](https://github.com/user-attachments/assets/00dab737-fd26-48c2-926e-c62649dbe92d)
