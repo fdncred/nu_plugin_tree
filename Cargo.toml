@@ -1,0 +1,20 @@
+[package]
+name = "nu_plugin_tree"
+version = "0.1.0"
+authors = ["Darren Schroeder <343840+fdncred@users.noreply.github.com>"]
+edition = "2021"
+description = "a nushell plugin called tree"
+license = "MIT"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+# for local development, you can use a path dependency
+# nu-plugin = { path = "../nushell/crates/nu-plugin" }
+# nu-protocol = { path = "../nushell/crates/nu-protocol", features = ["plugin"] }
+nu-plugin = "0.104.0"
+nu-protocol = { version = "0.104.0", features = ["plugin"] }
+
+[dev-dependencies]
+# nu-plugin-test-support = { path = "../nushell/crates/nu-plugin-test-support" }
+nu-plugin-test-support = { version = "0.104.0" }
