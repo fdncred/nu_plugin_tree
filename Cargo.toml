@@ -2,7 +2,7 @@
 name = "nu_plugin_tree"
 version = "0.1.0"
 authors = ["Darren Schroeder <343840+fdncred@users.noreply.github.com>"]
-edition = "2021"
+edition = "2024"
 description = "a nushell plugin called tree"
 license = "MIT"
 
@@ -12,10 +12,10 @@ license = "MIT"
 # for local development, you can use a path dependency
 # nu-plugin = { path = "../nushell/crates/nu-plugin" }
 # nu-protocol = { path = "../nushell/crates/nu-protocol", features = ["plugin"] }
-nu-plugin = "0.104.0"
-nu-protocol = { version = "0.104.0", features = ["plugin"] }
+nu-plugin = "0.105.1"
+nu-protocol = { version = "0.105.1", features = ["plugin"] }
 ptree = "0.5.2"
 
 [dev-dependencies]
 # nu-plugin-test-support = { path = "../nushell/crates/nu-plugin-test-support" }
-nu-plugin-test-support = { version = "0.104.0" }
+nu-plugin-test-support = { version = "0.105.1" }
