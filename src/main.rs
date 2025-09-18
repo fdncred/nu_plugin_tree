@@ -1,29 +1,28 @@
-use std::sync::Arc;
-
-use nu_plugin::{serve_plugin, MsgPackSerializer, Plugin, PluginCommand};
 use nu_plugin::{EngineInterface, EvaluatedCall};
+use nu_plugin::{MsgPackSerializer, Plugin, PluginCommand, serve_plugin};
 use nu_protocol::{Category, Config, Example, LabeledError, PipelineData, Signature, Value};
+use ptree::TreeBuilder;
 use ptree::item::StringItem;
 use ptree::output::print_tree_with;
 use ptree::print_config::PrintConfig;
 use ptree::style::{Color, Style};
-use ptree::TreeBuilder;
+use std::sync::Arc;
+
+use crate::view::ColorChoice;
+
+mod git;
+mod utils;
+mod view;
 
 pub struct TreePlugin;
 
 impl Plugin for TreePlugin {
     fn version(&self) -> String {
-        // This automatically uses the version of your package from Cargo.toml as the plugin version
-        // sent to Nushell
         env!("CARGO_PKG_VERSION").into()
     }
 
     fn commands(&self) -> Vec<Box<dyn PluginCommand<Plugin = Self>>> {
-        vec![
-            // Commands should be added here
-            // Box::new(TreeView::new(TreeBuilder::new("root".to_string()).build())),
-            Box::new(TreeView),
-        ]
+        vec![Box::new(TreeView)]
     }
 }
 
@@ -46,14 +45,20 @@ impl PluginCommand for TreeView {
     }
 
     fn signature(&self) -> Signature {
-        Signature::build(self.name()).category(Category::Experimental)
+        Signature::build(self.name())
+            .switch(
+                "path",
+                "tell the tree command that the parameter is a path",
+                Some('p'),
+            )
+            .category(Category::Experimental)
     }
 
     fn description(&self) -> &str {
         "View the contents of the pipeline as a tree."
     }
 
-    fn examples(&self) -> Vec<Example> {
+    fn examples(&self) -> Vec<Example<'_>> {
         vec![
             Example {
                 example: "scope commands | where name == with-env | tree",
@@ -63,6 +68,11 @@ impl PluginCommand for TreeView {
             Example {
                 example: "ls | tree",
                 description: "Transform the tabular output into a tree",
+                result: None,
+            },
+            Example {
+                example: "'some/folder' | tree --path",
+                description: "Transform the folder path into a typical tree display",
                 result: None,
             },
         ]
@@ -77,7 +87,40 @@ impl PluginCommand for TreeView {
     ) -> Result<PipelineData, LabeledError> {
         let _span = call.head;
         let config = engine.get_config()?;
+        let path_param = call.has_flag("path")?;
+        // engine.get_config()?.use_ansi_coloring = true;
 
+        if path_param {
+            // eprintln!("Running in path mode");
+            #[cfg(windows)]
+            nu_ansi_term::enable_ansi_support().unwrap();
+
+            // If the path flag is set, we assume the input is a path and handle it accordingly
+            if let PipelineData::Value(Value::String { val, .. }, _) = &input {
+                // Create a tree from the path string
+                let mut view_args = view::ViewArgs::default();
+                view_args.path = val.into();
+                view_args.color = ColorChoice::Always;
+                view_args.git_status = true;
+                view_args.size = true;
+                view_args.icons = true;
+                view_args.all = true;
+                view_args.permissions = true;
+                let ls_colors_str = engine
+                    .get_env_var("LS_COLORS")?
+                    .and_then(|v| Some(v.coerce_into_string().ok()?));
+                let ls_colors = utils::get_ls_colors(ls_colors_str);
+                view::run(&view_args, &ls_colors).map_err(|err| {
+                    LabeledError::new(format!("Error trying to create a tree view: {}", err))
+                })?;
+                return Ok(PipelineData::Empty);
+            } else {
+                return Err(LabeledError::new(
+                    "Expected a folder path to be provided when using --path flag",
+                ));
+            }
+        }
+        // eprintln!("Running in tree mode");
         // Process different types of input
         let tree = match input {
             PipelineData::ListStream(list_stream, _) => {
