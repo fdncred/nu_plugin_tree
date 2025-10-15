@@ -125,7 +125,7 @@ impl PluginCommand for TreeView {
         let tree = match input {
             PipelineData::ListStream(list_stream, _) => {
                 // For list streams, consume the stream directly
-                let values = list_stream.into_value();
+                let values = list_stream.into_value()?;
                 let mut tree_builder = TreeBuilder::new("root".to_string());
                 from_value_helper(&values, &mut tree_builder, config);
                 tree_builder.build()
