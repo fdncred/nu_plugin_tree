@@ -3,17 +3,20 @@ name = "nu_plugin_tree"
 version = "0.1.0"
 authors = ["Darren Schroeder <343840+fdncred@users.noreply.github.com>"]
 edition = "2024"
+repository = "https://github.com/fdncred/nu_plugin_tree"
 description = "a nushell plugin called tree"
 license = "MIT"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+# nushell dependencies
+nu-plugin = "0.110.0"
+nu-protocol = "0.110.0"
+
 # for local development, you can use a path dependency
-nu-plugin = { path = "../nushell/crates/nu-plugin" }
-nu-protocol = { path = "../nushell/crates/nu-protocol", features = ["plugin", "sqlite"] }
-# nu-plugin = "0.107.0"
-# nu-protocol = { version = "0.107.0", features = ["plugin"] }
+# nu-plugin = { path = "../nushell/crates/nu-plugin" }
+# nu-protocol = { path = "../nushell/crates/nu-protocol", features = ["plugin", "sqlite"] }
 
 ptree = "0.5.2"
 anyhow = "1.0.100"
@@ -24,5 +27,10 @@ nu-ansi-term = "0.50.3"
 devicons = "0.6.12"
 
 [dev-dependencies]
-nu-plugin-test-support = { path = "../nushell/crates/nu-plugin-test-support" }
-# nu-plugin-test-support = { version = "0.107.0" }
+nu-plugin-test-support = "0.110.0"
+
+# The profile that 'dist' will build with
+[profile.dist]
+inherits = "release"
+lto = "thin"
+# nu-plugin-test-support = { path = "../nushell/crates/nu-plugin-test-support" }
