@@ -16,9 +16,9 @@ nu-protocol = { path = "../nushell/crates/nu-protocol", features = ["plugin", "s
 # nu-protocol = { version = "0.107.0", features = ["plugin"] }
 
 ptree = "0.5.2"
-anyhow = "1.0.102"
+anyhow = "1.0.103"
 git2 = "0.21.0"
-ignore = "0.4.25"
+ignore = "0.4.28"
 lscolors = "0.21.0"
 nu-ansi-term = "0.50.3"
 devicons = "0.6.12"
